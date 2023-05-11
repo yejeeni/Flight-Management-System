@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>결제가 완료되었습니다!</title>
+</head>
+<body>
+ 
+<form method="post" action="client_ticketing1.html">
+<?php
+  $userid=$_POST['userid'];
+  $username=$_POST['username'];
+
+  echo "<input type='hidden' name='userid' value='".$userid."'>";
+  echo "<input type='hidden' name='username' value='".$username."'>";
+
+  $drive_number=$_POST['drive_number'];
+  $price = $_POST['price'];
+  $name = $_POST['name'];
+  $birth = $_POST['birth'];
+  $age = $_POST['age'];
+  $tel = $_POST['tel'];
+  $contry = $_POST['contry'];
+  $gender = $_POST['gender'];
+  $treatment = $_POST['treatment'];
+  $seat_number = $_POST['seat_number'];
+
+  $con=mysqli_connect("localhost", "root", "1024", "mydb") or die("MySQL 접속에 실패하였습니다.");
+
+  $sql1 = "INSERT INTO client_passenger VALUES( NULL, '".$name."','".$tel."','".$age."','".$birth."','".
+  $contry."','".$gender."','".$treatment."','".$userid."','".$drive_number."','".$price."');";
+
+  $ret1 = mysqli_query($con, $sql1);
+
+  $sql2_1 = "SELECT LAST_INSERT_ID(reser_number) AS last_reser_number
+  FROM client_passenger WHERE member_id='".$userid."' AND drive_info_drive_number='".$drive_number."'
+  ORDER BY reser_number DESC LIMIT 1;";
+
+  $ret2_1 = mysqli_query($con, $sql2_1);
+
+  while($row = mysqli_fetch_array($ret2_1)) {
+    $last_reser_number = $row['last_reser_number'];
+  }
+
+  $sql2_2 = "SELECT airplane_airnumber FROM drive_info WHERE drive_number = '".$drive_number."';";
+
+  $ret2_2 = mysqli_query($con, $sql2_2);
+
+  while($row = mysqli_fetch_array($ret2_2)) {
+    $airplane_number = $row['airplane_airnumber'];
+  }
+
+  mysqli_query($con, $sql2_3 = "UPDATE passenger_seat SET client_passenger_reser_number ='".$last_reser_number."'
+  WHERE drive_info_drive_number ='".$drive_number."' AND seat_seatnumber ='".$seat_number."' 
+  AND seat_airplane_airnumber = '".$airplane_number."';");
+
+  $ret2_3 = mysqli_query($con, $sql2_3);
+
+  if (($ret1) AND ($ret2_1) AND ($ret2_2) AND ($ret2_3)) {
+    echo "<h1>결제가 완료되었습니다!</h1>";
+  }
+  else {
+    echo "이런, 결제에 실패하였습니다. 실패 원인: ", mysqli_error($con);
+    exit();
+  }
+
+  mysqli_query($con, $sql3 = "UPDATE drive_info
+  SET soldout_date = IF (((SELECT COUNT(*) FROM passenger_seat 
+  WHERE  drive_info.drive_number = '".$drive_number."' AND client_passenger_reser_number is NULL)=0), NULL, curdate())
+  WHERE drive_info.drive_number = '".$drive_number."';");
+
+  $ret3 = mysqli_query($con, $sql3);
+
+  if ($ret3) { }
+  else {
+    echo "정산 오류. 실패 원인: ", mysqli_error($con);
+    exit();
+  }
+
+  echo "<h3>", $username, " 님, 감사합니다. 행복한 하루되세요*^^*</h3><br><br>";
+
+  mysqli_close($con);
+?>
+
+<input type="submit" value="처음으로"/>&emsp;
+
+
+</from>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>공항 비행기 정보 조회 페이지</title>
+        <meta charset="utf-8">
+    </head>
+
+    <body>
+        <h1>비행기 정보 조회</h1><br>
+        <form method="post" action="http://localhost/airport_airplaneCheck.php">
+            출발일자 : <input type="date" name="start_date">
+            도착일자 : <input type="date" name="arrive_date"><br>
+            출발지 : 
+            <select name="start_location" size="1">
+                <option value="Daegu" selected>대구</option>
+                <option value="Incheon" selected>인천</option>
+                <option value="Jeju" selected>제주</option>
+                <option value="Gimpo" selected>김포</option>
+            </select>
+            ->
+            도착지 :
+            <select name="arrive_location" size="1">
+                <option value="Daegu" selected>대구</option>
+                <option value="Incheon" selected>인천</option>
+                <option value="Jeju" selected>제주</option>
+                <option value="Gimpo" selected>김포</option>
+            </select><br>
+            항공사 : <input type="text" name="airline_name"><br>
+            운행번호 : <input type="number" min="0" name="drive_number"><br>
+            <input type="submit" value="검색하기"><br><br>
+        </form>
+            <br><br><h3><A href="airport_main.html">메인으로 가기</A></h3>
+    </body>
+</html>

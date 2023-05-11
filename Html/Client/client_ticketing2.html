@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>항공기 조회</title>
+</head>
+<body>
+
+<h5>항공기 예매 시스템</h5>
+<h1>항공기 조회</h1>
+
+<form method="post" action="client_ticketing3.html">
+<?php
+  $userid=$_POST['userid'];
+  $username=$_POST['username'];
+
+  echo $username, " 님, 안녕하세요 :)<br><br>";
+
+  echo "<input type='hidden' name='userid' value='".$userid."'>";
+  echo "<input type='hidden' name='username' value='".$username."'>";
+
+  $airport_start = $_POST["airport_start"];
+  $airport_finish = $_POST["airport_finish"];
+  $date = $_POST["date"];
+  $seat_grade = $_POST["seat_grade"];
+
+  echo "출발지: ", $airport_start, "&emsp;→&emsp;도착지: ", $airport_finish, "<br>";
+  echo "탑승날짜: ", $date, "&emsp;/&emsp;좌석등급: ", $seat_grade, "<br><br>";
+
+  echo "<input type='hidden' name='seat_grade' value=", $seat_grade, ">";
+
+  $con=mysqli_connect("localhost", "root", "1024", "mydb") or die("MySQL 접속에 실패하였습니다.");
+
+  $sql = "SELECT drive_number, airline_name, airplane_airnumber, airport_airport_name_start, airport_airport_name_finish, 
+  start_time, end_time, TIMESTAMPDIFF(minute, start_time, end_time) AS taken_time,
+  (SELECT COUNT(*) FROM passenger_seat JOIN seat ON passenger_seat.seat_seatnumber=seat.seatnumber
+  WHERE (passenger_seat.client_passenger_reser_number is NULL)
+  AND (drive_info.drive_number = passenger_seat.drive_info_drive_number) 
+  AND (seat.grade_price_grade = '$seat_grade')) AS remaining_seats,
+  ((SELECT price FROM grade_price WHERE grade = '$seat_grade') +
+  (SELECT price FROM expense 
+  WHERE drive_info.airport_airport_name_start = expense.airport_airport_name_start
+  AND drive_info.airport_airport_name_finish = expense.airport_airport_name_finish)) AS price, state
+  FROM drive_info
+  WHERE airport_airport_name_start = '$airport_start' AND airport_airport_name_finish = '$airport_finish'
+  AND date_format(start_time, '%Y-%m-%d') = '$date' AND state <> '-1';";
+
+  $ret = mysqli_query($con, $sql);
+
+  if ($ret) {
+    echo mysqli_num_rows($ret), "건이 조회됨.<br>";
+  }
+  else {
+    echo "데이터 조회에 실패하였습니다. 실패 원인: ", mysqli_error($con);
+    exit();
+  }
+
+  //표 이름 행
+  echo "<table  border=1>";
+  echo "  <tr>";
+  echo "    <th>운행 번호</th>";
+  echo "    <th>항공사</th>";
+  echo "    <th>비행기 번호</th>";
+  echo "    <th>출발지</th>";
+  echo "    <th>출발시간</th>";
+  echo "    <th>도착지</th>";
+  echo "    <th>도착시간</th>";
+  echo "    <th>가격</th>";
+  echo "    <th>좌석등급</th>";
+  echo "    <th>소요시간</th>";
+  echo "    <th>남은 여석</th>";
+  echo "    <th>지연</th>";
+  echo "  </tr>";
+  //한 행씩 출력
+  while($row = mysqli_fetch_array($ret)) {
+    echo "  <tr>";
+    echo "    <th>", $row['drive_number'], "</th>";
+    echo "    <th>", $row['airline_name'], "</th>";
+    echo "    <th>", $row['airplane_airnumber'], "</th>";
+    echo "    <th>", $row['airport_airport_name_start'], "</th>";
+    echo "    <th>", $row['start_time'], "</th>";
+    echo "    <th>", $row['airport_airport_name_finish'], "</th>";
+    echo "    <th>", $row['end_time'], "</th>";
+    echo "    <th>", $row['price'], "</th>";
+    echo "    <th>", $seat_grade, "</th>";
+    echo "    <th>", $row['taken_time'], "</th>";
+    echo "    <th>", $row['remaining_seats'], "</th>";
+    echo "    <th>", $row['state'], "분</th>";
+    echo "  </tr>";
+  }
+  echo "</table><br>";
+
+  mysqli_close($con);
+?>
+
+운행 번호: <input type="number" name="drive_number", required/> &emsp; <input type="submit" value="선택"/>
+
+<p style="font-size:small;">
+*희망하시는 운행번호를 정확히 입력 후 다음으로 넘어가주세요.</p>
+</from>
+</body>
+</html>

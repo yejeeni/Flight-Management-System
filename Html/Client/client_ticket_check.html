@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>고객 예매 확인 페이지</title>
+</head>
+<body>
+
+<h5>항공기 예매 시스템</h5>
+<h1>고객 예매 확인 페이지</h1>
+
+ <form method="post" action="client_ticketing1.html">
+<?php
+  $userid=$_POST['userid'];
+  $username=$_POST['username'];
+
+  echo $username, " 님, 안녕하세요 :)<br><br>";
+
+  echo "<input type='hidden' name='userid' value='".$userid."'>";
+  echo "<input type='hidden' name='username' value='".$username."'>";
+
+  $con=mysqli_connect("localhost", "root", "1024", "mydb") or die("MySQL 접속에 실패하였습니다.");
+
+  $sql = "SELECT *FROM ((client_passenger JOIN drive_info 
+  ON client_passenger.drive_info_drive_number=drive_info.drive_number)
+  JOIN passenger_seat
+  ON client_passenger.reser_number=passenger_seat.client_passenger_reser_number)
+  JOIN seat
+  ON passenger_seat.seat_airplane_airnumber = seat.airplane_airnumber
+  AND passenger_seat.seat_seatnumber = seat.seatnumber
+  WHERE member_id = '".$userid."';";
+
+  $ret = mysqli_query($con, $sql);
+
+  if ($ret) {
+    echo mysqli_num_rows($ret), "건이 조회됨.<br>";
+  }
+  else {
+    echo "데이터 조회에 실패하였습니다. 실패 원인: ", mysqli_error($con);
+    exit();
+  }
+
+  //표 이름 행
+  echo "<table  border=1>";
+  echo "  <tr>";
+  echo "    <th>예매번호</th>";
+  echo "    <th>탑승자</th>";
+  echo "    <th>항공사</th>";
+  echo "    <th>비행기 번호</th>";
+  echo "    <th>출발지</th>";
+  echo "    <th>출발시간</th>";
+  echo "    <th>도착지</th>";
+  echo "    <th>도착시간</th>";
+  echo "    <th>체크인 시간</th>";
+  echo "    <th>게이트</th>";
+  echo "    <th>좌석등급</th>";
+  echo "    <th>가격</th>";
+  echo "    <th>상태</th>";
+  echo "  </tr>";
+  //한 행씩 출력
+  while($row = mysqli_fetch_array($ret)) {
+    echo "  <tr>";
+    echo "    <th>", $row['reser_number'], "</th>";
+    echo "    <th>", $row['name'], "</th>";
+    echo "    <th>", $row['airline_name'], "</th>";
+    echo "    <th>", $row['airplane_airnumber'], "</th>";
+    echo "    <th>", $row['airport_airport_name_start'], "</th>";
+    echo "    <th>", $row['start_time'], "</th>";
+    echo "    <th>", $row['airport_airport_name_finish'], "</th>";
+    echo "    <th>", $row['end_time'], "</th>";
+    echo "    <th>", $row['checkintime'], "</th>";
+    echo "    <th>", $row['gate'], "</th>";
+    echo "    <th>", $row['grade_price_grade'], "</th>";
+    echo "    <th>", $row['price'], "</th>";
+    echo "    <th>", $row['state'], "</th>";
+    echo "  </tr>";
+  }
+  echo "</table><br>";
+
+  mysqli_close($con);
+?>
+
+<input type="submit" value="이전으로"/>&emsp;
+
+</form> 
+</body>
+</html>

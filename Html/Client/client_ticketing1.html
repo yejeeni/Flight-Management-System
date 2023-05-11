@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>항공기 조회</title>
+</head>
+<body>
+
+<h5>항공기 예매 시스템</h5>
+<h1>항공기 조회</h1>
+
+<form method="post" action="client_ticketing2.html">
+<?php
+  $userid=$_POST['userid'];
+  $username=$_POST['username'];
+
+  echo $username, " 님, 안녕하세요 :)<br><br>";
+
+  echo "<input type='hidden' name='userid' value='".$userid."'>";
+  echo "<input type='hidden' name='username' value='".$username."'>";
+?>
+
+<table frame="box">
+  <tr>
+    <th>출발지: <select name="airport_start"  size="1">
+                           <option>인천</option> <option>제주</option>
+                           <option>대구</option> <option>김포</option>
+                         </select></th>
+    <th>&emsp;<b>→</b>&emsp;</th>
+    <th>도착지: <select name="airport_finish"  size="1">
+                           <option>인천</option> <option>제주</option>
+                           <option>대구</option> <option>김포</option>
+                         </select></th>
+  </tr>
+  <tr>
+    <th>&nbsp;탑승날짜: <input type="date" name="date" required/>&nbsp;</th>
+    <th></th>
+    <th>&emsp;좌석등급: <select name="seat_grade"  size="1">
+                          <option>퍼스트</option> <option>비지니스</option>
+                          <option>이코노미</option></select>&emsp;</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th><input type="submit" value="조회"/></th>
+    <th></th>
+  </tr>
+</table>
+<br>
+
+</form>
+
+<form method="post" action="client_ticket_check.html">
+<?php
+  $userid=$_POST['userid'];
+  $username=$_POST['username'];
+
+  echo "<input type='hidden' name='userid' value='".$userid."'>";
+  echo "<input type='hidden' name='username' value='".$username."'>";
+?>
+
+<input type="submit" value="예매확인"/>
+</form>
+
+<br><A href="main.html">시작화면으로 돌아가기</a>
+</body>
+</html>
